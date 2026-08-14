@@ -1,0 +1,82 @@
+:root {
+  /* 宣纸墨韵 · 中式美学色系 */
+  --color-bg-primary: #FBF8F2;        /* 宣纸白 */
+  --color-bg-secondary: #F3EDE1;      /* 熟宣/浅云纸 */
+  --color-bg-tertiary: #F3EDE1;
+  --color-text-primary: #3B322A;      /* 浓墨 */
+  --color-text-secondary: #6B5F55;    /* 淡墨 */
+  --color-text-tertiary: #9A8D7E;     /* 浅墨 */
+
+  /* 主强调：鎏金（暖金） */
+  --gold-50: #FBF3E0;
+  --gold-100: #F5E3B8;
+  --gold-200: #EACF8C;
+  --gold-400: #D4A94E;
+  --gold-500: #C19A3B;
+  --gold-600: #A67F2A;
+  --gold-700: #8A6620;
+  --gold-800: #6E501A;
+
+  /* 辅强调：朱砂赭红 */
+  --cinnabar-50: #FAEAE2;
+  --cinnabar-100: #F0CDBB;
+  --cinnabar-300: #D98B62;
+  --cinnabar-400: #C9693F;
+  --cinnabar-500: #B95732;
+  --cinnabar-600: #A84A24;
+  --cinnabar-700: #8C3A1B;
+  --cinnabar-800: #6F2D15;
+
+  /* 竹青（成长/完成/健康） */
+  --teal-50: #E8F0E4;
+  --teal-100: #C9DCC0;
+  --teal-400: #6E9674;
+  --teal-600: #4C7454;
+  --teal-800: #37543D;
+
+  /* 黛蓝（信息/链接/水） */
+  --blue-50: #E5EBF0;
+  --blue-100: #C4D2DE;
+  --blue-400: #4E7A99;
+  --blue-600: #2F5875;
+  --blue-800: #1F3D53;
+
+  /* 藤黄（警示/待办） */
+  --amber-50: #F8EDD8;
+  --amber-100: #EFD9A8;
+  --amber-400: #C9962E;
+  --amber-600: #9A6D1C;
+  --amber-800: #75511A;
+
+  /* 绛红（删除/错误/高优先） */
+  --red-50: #F7E4DE;
+  --red-100: #EFC2B5;
+  --red-400: #C4573B;
+  --red-600: #9E3B26;
+  --red-800: #7A2C1B;
+
+  /* 藕荷（笔记粉） */
+  --pink-50: #F7E9E4;
+  --pink-100: #EFCFC4;
+  --pink-400: #C98A7B;
+
+  /* 兼容旧变量名：主强调映射到鎏金 */
+  --purple-50: var(--gold-50);
+  --purple-100: var(--gold-100);
+  --purple-200: var(--gold-200);
+  --purple-400: var(--gold-400);
+  --purple-500: var(--gold-500);
+  --purple-600: var(--gold-600);
+  --purple-700: var(--gold-700);
+  --purple-800: var(--gold-800);
+
+  --color-border: #DACFB8;            /* 竹纸描边 */
+  --color-border-light: #EAE2D0;
+
+  --radius-md: 6px;
+  --radius-lg: 10px;
+
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --font-kai: "Kaiti SC", "STKaiti", "KaiTi", "STKaiti SC", "AR PL UKai CN", serif;
+  --font-song: "Songti SC", "STSong", "SimSun", "NSimSun", serif;
+}
