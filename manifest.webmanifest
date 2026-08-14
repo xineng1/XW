@@ -1,0 +1,31 @@
+{
+  "name": "栖梧 · 空间",
+  "short_name": "栖梧",
+  "description": "个人生活与工作的中式空间",
+  "start_url": "/XW/",
+  "scope": "/XW/",
+  "display": "standalone",
+  "background_color": "#1a1714",
+  "theme_color": "#d4af37",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
