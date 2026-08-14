@@ -1,49 +1,46 @@
 import os
-from PIL import Image, ImageDraw, ImageFont
+import math
+from PIL import Image, ImageDraw
 
-GOLD = (212, 175, 55, 255)
-DARK = (26, 23, 20, 255)
+RED = (200, 30, 25, 255)    # 朱红
+GOLD = (244, 196, 48, 255)  # 亮金
 OUT = "icons"
 
 
-def find_cjk_font():
-    candidates = [
-        "/usr/share/fonts/truetype/noto/NotoSansCJK-Regular.ttc",
-        "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
-        "/usr/share/fonts/truetype/wqy/wqy-zenhei.ttc",
-        "/usr/share/fonts/truetype/wqy/wqy-microhei.ttc",
-    ]
-    for c in candidates:
-        if os.path.exists(c):
-            return c
-    for root, dirs, files in os.walk("/usr/share/fonts"):
-        for f in files:
-            if f.lower().endswith((".ttc", ".ttf")):
-                return os.path.join(root, f)
-    raise FileNotFoundError("No usable font found")
+def pt(cx, cy, angle_deg, r):
+    rad = math.radians(angle_deg)
+    return (cx + r * math.sin(rad), cy - r * math.cos(rad))
 
 
-FONT = find_cjk_font()
-os.makedirs(OUT, exist_ok=True)
+def leaf_points(cx, cy, R):
+    tips = [0, 72, 144, 216, 288]
+    pts = []
+    for a in tips:
+        # 每片裂叶用「左肩-叶尖-右肩」做成宽圆裂，谷更深，更像梧桐
+        pts.append(pt(cx, cy, a - 17, R * 0.82))
+        pts.append(pt(cx, cy, a, R))
+        pts.append(pt(cx, cy, a + 17, R * 0.82))
+        pts.append(pt(cx, cy, a + 36, R * 0.42))
+    return pts
 
 
 def make(size, maskable=False):
-    img = Image.new("RGBA", (size, size), DARK)
+    img = Image.new("RGBA", (size, size), RED)
     d = ImageDraw.Draw(img)
     cx = cy = size / 2.0
-    r = size * 0.40 * (0.82 if maskable else 1.0)
-    d.ellipse([cx - r, cy - r, cx + r, cy + r], fill=GOLD)
-    fs = int(r * 1.5)
-    font = ImageFont.truetype(FONT, fs)
-    text = "栖"
-    bb = d.textbbox((0, 0), text, font=font)
-    tw, th = bb[2] - bb[0], bb[3] - bb[1]
-    x = cx - tw / 2 - bb[0]
-    y = cy - th / 2 - bb[1]
-    d.text((x, y), text, font=font, fill=DARK)
+    R = size * 0.33 * (0.82 if maskable else 1.0)
+    d.polygon(leaf_points(cx, cy, R), fill=GOLD)
+    stem_w = max(1, int(size * 0.05))
+    d.line([(cx, cy + R * 0.5), (cx, cy + R * 1.05)], fill=GOLD, width=stem_w)
+    vein_w = max(1, int(size * 0.014))
+    for a in (0, 72, 144, 216, 288):
+        d.line([(cx, cy), pt(cx, cy, a, R)], fill=RED, width=vein_w)
+        d.line([(cx, cy), pt(cx, cy, a - 17, R * 0.82)], fill=RED, width=vein_w)
+        d.line([(cx, cy), pt(cx, cy, a + 17, R * 0.82)], fill=RED, width=vein_w)
     return img
 
 
+os.makedirs(OUT, exist_ok=True)
 for s in (192, 512):
     make(s, False).save(os.path.join(OUT, f"icon-{s}.png"))
 make(512, True).save(os.path.join(OUT, "maskable-512.png"))
