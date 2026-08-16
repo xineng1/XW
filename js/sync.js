@@ -12,12 +12,16 @@
     return client;
   }
 
+  // 页面加载即创建 client，Supabase 会自动从 localStorage 恢复会话
+  try { ensureClient(); } catch (e) { console.warn('[sync] client init deferred:', e.message); }
+
   async function currentUser() {
     if (!client) return null;
     try {
-      const { data, error } = await client.auth.getUser();
+      // getSession 读取本地存储，无网络请求，速度快，适合每次写操作判断
+      const { data, error } = await client.auth.getSession();
       if (error) return null;
-      return data && data.user ? data.user : null;
+      return data && data.session ? data.session.user : null;
     } catch (e) { return null; }
   }
 
