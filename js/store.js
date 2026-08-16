@@ -5,6 +5,12 @@
     return KCBAPP.db.open();
   }
 
+  function safePush(storeName, id, op, data) {
+    try {
+      if (root.KCBAPP && root.KCBAPP.sync) root.KCBAPP.sync.push(storeName, id, op, data);
+    } catch (e) { /* 同步失败不影响本地操作 */ }
+  }
+
   function add(storeName, data) {
     return getDb().then(function (db) {
       return new Promise(function (resolve, reject) {
@@ -13,6 +19,9 @@
         tx.oncomplete = function () { resolve(data); };
         tx.onerror = function () { reject(tx.error); };
       });
+    }).then(function (res) {
+      if (data && data.id != null) safePush(storeName, data.id, 'upsert', data);
+      return res;
     });
   }
 
@@ -22,7 +31,7 @@
         const tx = db.transaction(storeName, 'readonly');
         const req = tx.objectStore(storeName).get(id);
         req.onsuccess = function () { resolve(req.result || null); };
-        req.onerror = function () { reject(req.error); };
+        req.onerror = function () { reject(tx.error); };
       });
     });
   }
@@ -33,7 +42,7 @@
         const tx = db.transaction(storeName, 'readonly');
         const req = tx.objectStore(storeName).getAll();
         req.onsuccess = function () { resolve(req.result || []); };
-        req.onerror = function () { reject(req.error); };
+        req.onerror = function () { reject(tx.error); };
       });
     });
   }
@@ -46,6 +55,9 @@
         tx.oncomplete = function () { resolve(data); };
         tx.onerror = function () { reject(tx.error); };
       });
+    }).then(function (res) {
+      if (data && data.id != null) safePush(storeName, data.id, 'upsert', data);
+      return res;
     });
   }
 
@@ -57,6 +69,9 @@
         tx.oncomplete = function () { resolve(true); };
         tx.onerror = function () { reject(tx.error); };
       });
+    }).then(function (res) {
+      safePush(storeName, id, 'remove', null);
+      return res;
     });
   }
 
@@ -68,7 +83,7 @@
         const idx = store.index(indexName);
         const req = idx.getAll(value);
         req.onsuccess = function () { resolve(req.result || []); };
-        req.onerror = function () { reject(req.error); };
+        req.onerror = function () { reject(tx.error); };
       });
     });
   }
@@ -90,7 +105,7 @@
         const tx = db.transaction(storeName, 'readonly');
         const req = tx.objectStore(storeName).count();
         req.onsuccess = function () { resolve(req.result); };
-        req.onerror = function () { reject(req.error); };
+        req.onerror = function () { reject(tx.error); };
       });
     });
   }
