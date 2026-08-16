@@ -12,17 +12,20 @@
     return client;
   }
 
-  function currentUser() {
+  async function currentUser() {
     if (!client) return null;
-    const s = client.auth.getSession();
-    const sess = s && s.data ? s.data.session : null;
-    return sess ? sess.user : null;
+    try {
+      const { data, error } = await client.auth.getUser();
+      if (error) return null;
+      return data && data.user ? data.user : null;
+    } catch (e) { return null; }
   }
 
   async function signUp(email, password) {
     const c = ensureClient();
     const { data, error } = await c.auth.signUp({ email, password });
     if (error) throw error;
+    if (!data.session) throw new Error('注册成功但未建立会话：请确认 Supabase 的 Confirm email 已关闭，或去邮箱点确认链接后再登录');
     return data;
   }
 
@@ -37,10 +40,10 @@
     if (client) { await client.auth.signOut(); }
   }
 
-  function isSignedIn() { return !!currentUser(); }
+  async function isSignedIn() { return !!(await currentUser()); }
 
   async function push(storeName, id, op, data) {
-    const user = currentUser();
+    const user = await currentUser();
     if (!user) return;
     const c = ensureClient();
     try {
@@ -56,7 +59,7 @@
   }
 
   async function pullAll() {
-    const user = currentUser();
+    const user = await currentUser();
     if (!user) return;
     const c = ensureClient();
     const { data, error } = await c.from('records').select('*');
@@ -67,7 +70,7 @@
   }
 
   async function syncNow() {
-    const user = currentUser();
+    const user = await currentUser();
     if (!user) throw new Error('请先在设置页登录');
     await pullAll();
     const names = KCBAPP.db.STORES.map(function (s) { return s.name; });
@@ -90,7 +93,7 @@
     push: push,
     pullAll: pullAll,
     syncNow: syncNow,
-    getStatus: function () { return { signedIn: isSignedIn() }; }
+    getStatus: async function () { return { signedIn: await isSignedIn() }; }
   };
 
   if (typeof module !== 'undefined' && module.exports) module.exports = KCBAPP;
