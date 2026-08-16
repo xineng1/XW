@@ -100,6 +100,23 @@
     html += '<button class="btn-outline" onclick="KCBAPP.settings.importFromPicker()">导入 JSON</button>';
     html += '<div style="font-size:10px;color:var(--color-text-tertiary);margin-top:8px;">换机或防丢，一键备份全部数据</div>';
     html += '</div>';
+
+    html += '<div class="section-title">云端同步（Supabase）</div>';
+    html += '<div class="card" style="margin-bottom:16px;">';
+    const syncSt = KCBAPP.sync.getStatus();
+    if (syncSt.signedIn) {
+      html += '<div style="font-size:11px;color:var(--color-text-secondary);margin-bottom:8px;">已登录，数据自动同步到你的云端</div>';
+      html += '<button class="btn-primary" onclick="KCBAPP.settings.syncNow()">立即同步</button> ';
+      html += '<button class="btn-outline" onclick="KCBAPP.settings.syncSignOut()">退出登录</button>';
+    } else {
+      html += '<input id="syncEmail" placeholder="邮箱" style="width:100%;padding:6px;margin-bottom:6px;box-sizing:border-box;">';
+      html += '<input id="syncPwd" type="password" placeholder="密码（首次即注册）" style="width:100%;padding:6px;margin-bottom:8px;box-sizing:border-box;">';
+      html += '<button class="btn-primary" onclick="KCBAPP.settings.syncSignIn()">登录 / 注册</button> ';
+      html += '<button class="btn-outline" onclick="KCBAPP.settings.syncNow()">立即同步</button>';
+    }
+    html += '<div style="font-size:10px;color:var(--color-text-tertiary);margin-top:8px;">多设备用同一邮箱登录即可互通，数据存你自己的 Supabase。</div>';
+    html += '</div>';
+
     html += '<div class="section-title">清空数据</div>';
     html += '<div class="card" style="border-color:var(--red-400);">';
     html += '<div style="font-size:12px;color:var(--red-600);font-weight:500;margin-bottom:8px;">危险操作</div>';
@@ -130,7 +147,34 @@
     render();
   }
 
-  KCBAPP.settings = { render, getDataOverview, exportData, importData, clearStore, clearAll, downloadBackup, pickFile, importFromPicker, confirmClearAll, storeNames };
+  async function syncSignIn() {
+    const emailEl = document.getElementById('syncEmail');
+    const pwdEl = document.getElementById('syncPwd');
+    const email = emailEl ? emailEl.value.trim() : '';
+    const pwd = pwdEl ? pwdEl.value : '';
+    if (!email || !pwd) { alert('请输入邮箱和密码'); return; }
+    try {
+      let signedIn = false;
+      try { await KCBAPP.sync.signIn(email, pwd); signedIn = true; }
+      catch (e) { /* 未注册则走注册 */ }
+      if (!signedIn) await KCBAPP.sync.signUp(email, pwd);
+      alert('登录/注册成功，正在拉取云端数据');
+      await KCBAPP.sync.pullAll();
+      render();
+    } catch (e) { alert('操作失败：' + e.message); }
+  }
+
+  async function syncSignOut() {
+    await KCBAPP.sync.signOut();
+    render();
+  }
+
+  async function syncNow() {
+    try { await KCBAPP.sync.syncNow(); alert('同步完成'); render(); }
+    catch (e) { alert('同步失败：' + e.message); }
+  }
+
+  KCBAPP.settings = { render, getDataOverview, exportData, importData, clearStore, clearAll, downloadBackup, pickFile, importFromPicker, confirmClearAll, storeNames, syncSignIn, syncSignOut, syncNow };
 
   if (typeof module !== 'undefined' && module.exports) module.exports = KCBAPP;
 })(typeof window !== 'undefined' ? window : globalThis);
