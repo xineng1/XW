@@ -103,7 +103,7 @@
 
     html += '<div class="section-title">云端同步（Supabase）</div>';
     html += '<div class="card" style="margin-bottom:16px;">';
-    const syncSt = KCBAPP.sync.getStatus();
+    const syncSt = await KCBAPP.sync.getStatus();
     if (syncSt.signedIn) {
       html += '<div style="font-size:11px;color:var(--color-text-secondary);margin-bottom:8px;">已登录，数据自动同步到你的云端</div>';
       html += '<button class="btn-primary" onclick="KCBAPP.settings.syncNow()">立即同步</button> ';
